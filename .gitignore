@@ -1,0 +1,9 @@
+microservice4net/obj/*
+microservice4net/bin/*
+MicroService4Net.Example/obj/*
+MicroService4Net.Example/bin/*
+MicroService4Net/bin/*
+MicroService4Net/obj/*
+packages/*
+.hg/*
+.hgignore
