@@ -3,7 +3,8 @@ using System.Linq;
 using System.Net.Http.Formatting;
 using System.Reflection;
 using System.Web.Http;
-using System.Web.Http.SelfHost;
+using Microsoft.Owin.Hosting;
+using Owin;
 
 namespace MicroService4Net.Network
 {
@@ -11,7 +12,8 @@ namespace MicroService4Net.Network
     {
         #region Fields
 
-        private readonly HttpSelfHostServer _server;
+        private readonly StartOptions _options;
+        private IDisposable _serverDisposable;
 
         #endregion
 
@@ -19,15 +21,7 @@ namespace MicroService4Net.Network
 
         public SelfHostServer(string uri, bool callControllersStaticConstractorsOnInit = true)
         {
-            var config = new HttpSelfHostConfiguration(uri);
-
-            config.MapHttpAttributeRoutes();
-
-            config.EnableCors();
-            config.Formatters.Clear();
-            config.Formatters.Add(new JsonMediaTypeFormatter());
-
-            _server = new HttpSelfHostServer(config);
+            _options = new StartOptions(uri);
 
             if (callControllersStaticConstractorsOnInit)
                 CallControllersStaticConstractors();
@@ -39,11 +33,14 @@ namespace MicroService4Net.Network
 
         #region Public
 
-        public void Connect()
+        public void Connect(Action<IAppBuilder> buildApp = null)
         {
             try
             {
-                _server.OpenAsync().Wait();
+                if (buildApp == null)
+                    buildApp = DefaultBuildApp;
+
+                _serverDisposable = WebApp.Start(_options, buildApp);
             }
             catch (Exception ex)
             {
@@ -51,9 +48,22 @@ namespace MicroService4Net.Network
             }
         }
 
+        private static void DefaultBuildApp(IAppBuilder appBuilder)
+        {
+            var config = new HttpConfiguration();
+
+            config.Formatters.Clear();
+            config.Formatters.Add(new JsonMediaTypeFormatter());
+
+            config.MapHttpAttributeRoutes();
+
+            appBuilder.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
+            appBuilder.UseWebApi(config);
+        }
+
         public async void Dispose()
         {
-            await _server.CloseAsync();
+            _serverDisposable.Dispose();
         }
 
         #endregion
@@ -68,7 +78,7 @@ namespace MicroService4Net.Network
                 InvokeStaticConstractor(type);
         }
 
-        private void InvokeStaticConstractor(TypeInfo type)
+        private static void InvokeStaticConstractor(Type type)
         {
             Activator.CreateInstance(type);
         }

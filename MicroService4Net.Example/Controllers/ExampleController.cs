@@ -1,9 +1,8 @@
 ﻿using System.Web.Http;
-using System.Web.Http.Cors;
+using Newtonsoft.Json.Linq;
 
 namespace MicroService4Net.Example.Controllers
 {
-    [EnableCors("*","*","*")]
     public class ExampleController : ApiController
     {
         private static readonly string ExampleField;
@@ -16,9 +15,16 @@ namespace MicroService4Net.Example.Controllers
         [Route("Example")]
         public IHttpActionResult GetExample()
         {
-            return Ok(ExampleField);
+            var x = new {Msg = "Example"};
+
+            return Ok(x);
         }
 
+        [Route("Example")]
+        public IHttpActionResult PostExample([FromBody]JObject x)
+        {
+            return Ok(x);
+        }
 
 
     }
