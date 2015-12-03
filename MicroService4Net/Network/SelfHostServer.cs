@@ -27,20 +27,15 @@ namespace MicroService4Net.Network
                 CallControllersStaticConstractors();
         }
 
-
-
         #endregion
 
         #region Public
 
-        public void Connect(Action<IAppBuilder> buildApp = null)
+        public void Connect(Action<HttpConfiguration> configure, bool useCors)
         {
             try
             {
-                if (buildApp == null)
-                    buildApp = DefaultBuildApp;
-
-                _serverDisposable = WebApp.Start(_options, buildApp);
+                _serverDisposable = WebApp.Start(_options, appBuilder => BuildApp(appBuilder, configure, useCors));
             }
             catch (Exception ex)
             {
@@ -48,7 +43,7 @@ namespace MicroService4Net.Network
             }
         }
 
-        private static void DefaultBuildApp(IAppBuilder appBuilder)
+        private static void BuildApp(IAppBuilder appBuilder, Action<HttpConfiguration> configure, bool useCors)
         {
             var config = new HttpConfiguration();
 
@@ -57,7 +52,12 @@ namespace MicroService4Net.Network
 
             config.MapHttpAttributeRoutes();
 
-            appBuilder.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
+            if ( configure != null)
+                configure(config);
+
+            if (useCors)
+                appBuilder.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
+            
             appBuilder.UseWebApi(config);
         }
 

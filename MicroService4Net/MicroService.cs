@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.ServiceProcess;
+using System.Web.Http;
 using MicroService4Net.Network;
 using MicroService4Net.ServiceInternals;
 using Owin;
@@ -23,16 +24,19 @@ namespace MicroService4Net
         private readonly WindowsServiceManager _serviceManager;
         private readonly RegistryManipulator _registryManipulator;
         private SelfHostServer _selfHostServer;
-        private Action<IAppBuilder> _buildApp;
+        private readonly Action<HttpConfiguration> _configure;
+        private readonly bool _useCors;
 
         #endregion
 
         #region C'tor
 
-        public MicroService(int port = 8080, string serviceDisplayName = null, string serviceName = null, Action<IAppBuilder> buildApp = null)
+        public MicroService(int port = 8080, string serviceDisplayName = null, string serviceName = null, 
+            Action<HttpConfiguration> configure = null, bool useCors = true)
         {
             _port = port;
-            _buildApp = buildApp;
+            _configure = configure;
+            _useCors = useCors;
 
             var assemblyName = Assembly.GetEntryAssembly().GetName().Name;
             _serviceDisplayName = serviceDisplayName ?? assemblyName;
@@ -41,7 +45,7 @@ namespace MicroService4Net
             _serviceManager = new WindowsServiceManager(_serviceDisplayName);
             _registryManipulator = new RegistryManipulator(serviceName);
 
-            InternalService.OsStarted += () => Start(buildApp);
+            InternalService.OsStarted += () => Start(_configure, _useCors);
             InternalService.OsStopped += Stop;
             ProjectInstaller.InitInstaller(_serviceDisplayName,serviceName);
 
@@ -81,7 +85,7 @@ namespace MicroService4Net
 
         private void RunConsole()
         {
-            Start(_buildApp);
+            Start(_configure, _useCors);
             Console.WriteLine("Press any key to exit...");
             Console.ReadLine();
             Stop();
@@ -114,11 +118,11 @@ namespace MicroService4Net
                 OnServiceStopped.Invoke();
         }
 
-        private void Start(Action<IAppBuilder> buildApp = null)
+        private void Start(Action<HttpConfiguration> configure, bool useCors)
         {
             _selfHostServer = new SelfHostServer("http://localhost:" + _port);
 
-            _selfHostServer.Connect(buildApp);
+            _selfHostServer.Connect(configure,useCors);
             Console.WriteLine("Service {0} started on port {1}", _serviceDisplayName,_port);
             if ( OnServiceStarted != null)
                 OnServiceStarted.Invoke();
