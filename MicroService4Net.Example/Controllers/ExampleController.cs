@@ -15,7 +15,7 @@ namespace MicroService4Net.Example.Controllers
         [Route("Example")]
         public IHttpActionResult GetExample()
         {
-            var x = new {Msg = "Example"};
+            var x = new {Msg = ExampleField };
 
             return Ok(x);
         }

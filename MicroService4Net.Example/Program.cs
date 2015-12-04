@@ -1,6 +1,4 @@
-﻿using MicroService4Net.Network;
-
-namespace MicroService4Net.Example
+﻿namespace MicroService4Net.Example
 {
     class Program
     {
