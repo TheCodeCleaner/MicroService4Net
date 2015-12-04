@@ -7,3 +7,6 @@ MicroService4Net/obj/*
 packages/*
 .hg/*
 .hgignore
+MicroService4Net.sln.DotSettings.user
+.vs/MicroService4Net/v14/.suo
+MicroService4Net.Example/MicroService4Net.Example.csproj.user
