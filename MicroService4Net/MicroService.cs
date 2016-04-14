@@ -4,7 +4,6 @@ using System.ServiceProcess;
 using System.Web.Http;
 using MicroService4Net.Network;
 using MicroService4Net.ServiceInternals;
-using Owin;
 
 namespace MicroService4Net
 {
