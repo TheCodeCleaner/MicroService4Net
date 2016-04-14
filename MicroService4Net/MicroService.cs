@@ -120,7 +120,7 @@ namespace MicroService4Net
 
         private void Start(Action<HttpConfiguration> configure, bool useCors)
         {
-            _selfHostServer = new SelfHostServer("http://localhost:" + _port);
+            _selfHostServer = new SelfHostServer(_port);
 
             _selfHostServer.Connect(configure,useCors);
             Console.WriteLine("Service {0} started on port {1}", _serviceDisplayName,_port);

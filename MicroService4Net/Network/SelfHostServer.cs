@@ -19,9 +19,9 @@ namespace MicroService4Net.Network
 
         #region C'tor
 
-        public SelfHostServer(string uri, bool callControllersStaticConstractorsOnInit = true)
+        public SelfHostServer(int port, bool callControllersStaticConstractorsOnInit = true)
         {
-            _options = new StartOptions(uri);
+            _options = new StartOptions("http://*:" + port);
 
             if (callControllersStaticConstractorsOnInit)
                 CallControllersStaticConstractors();
@@ -57,7 +57,7 @@ namespace MicroService4Net.Network
 
             if (useCors)
                 appBuilder.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
-            
+
             appBuilder.UseWebApi(config);
         }
 
@@ -70,7 +70,7 @@ namespace MicroService4Net.Network
 
         #region Private
 
-        private void CallControllersStaticConstractors()
+        private static void CallControllersStaticConstractors()
         {
             foreach (
                 var type in
@@ -80,7 +80,7 @@ namespace MicroService4Net.Network
 
         private static void InvokeStaticConstractor(Type type)
         {
-            Activator.CreateInstance(type);
+            System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(type.TypeHandle);
         }
 
         #endregion
