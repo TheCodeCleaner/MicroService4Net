@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicroService4Net", "microservice4net\MicroService4Net.csproj", "{A3CD548B-DB44-4237-90EF-23663145BED9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicroService4Net.Example", "MicroService4Net.Example\MicroService4Net.Example.csproj", "{CCEA93C4-58A8-49E1-89FC-D0C8C9A14343}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicroService4Net.Example.FromNuget", "MicroService4Net.Example.FromNuget\MicroService4Net.Example.FromNuget.csproj", "{3B12467F-4793-45A5-B3AA-7EB2EACFD15D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{CCEA93C4-58A8-49E1-89FC-D0C8C9A14343}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CCEA93C4-58A8-49E1-89FC-D0C8C9A14343}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CCEA93C4-58A8-49E1-89FC-D0C8C9A14343}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B12467F-4793-45A5-B3AA-7EB2EACFD15D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B12467F-4793-45A5-B3AA-7EB2EACFD15D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B12467F-4793-45A5-B3AA-7EB2EACFD15D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B12467F-4793-45A5-B3AA-7EB2EACFD15D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

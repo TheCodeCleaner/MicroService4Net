@@ -10,3 +10,5 @@ packages/*
 MicroService4Net.sln.DotSettings.user
 .vs/MicroService4Net/v14/.suo
 MicroService4Net.Example/MicroService4Net.Example.csproj.user
+MicroService4Net.Example.FromNuget/bin/*
+MicroService4Net.Example.FromNuget/obj/*

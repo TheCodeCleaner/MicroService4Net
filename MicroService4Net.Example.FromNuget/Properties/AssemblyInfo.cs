@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("MicroService4Net")]
-[assembly: AssemblyDescription("Create Micro Service")]
+[assembly: AssemblyTitle("MicroService4Net.Example.FromNuget")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("MicroService4Net")]
-[assembly: AssemblyCopyright("Copyright Code Cleaner© 2016")]
+[assembly: AssemblyProduct("MicroService4Net.Example.FromNuget")]
+[assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("780fd9c0-dae7-4685-9c55-4681aede25c8")]
+[assembly: Guid("3b12467f-4793-45a5-b3aa-7eb2eacfd15d")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -29,4 +29,8 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("2.0.*")]
+// You can specify all the values or you can default the Build and Revision Numbers 
+// by using the '*' as shown below:
+// [assembly: AssemblyVersion("1.0.*")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]
