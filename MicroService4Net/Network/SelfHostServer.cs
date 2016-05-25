@@ -8,81 +8,89 @@ using Owin;
 
 namespace MicroService4Net.Network
 {
-    public class SelfHostServer : IDisposable
-    {
-        #region Fields
+	public class SelfHostServer : IDisposable
+	{
+		#region Fields
 
-        private readonly StartOptions _options;
-        private IDisposable _serverDisposable;
+		private readonly StartOptions _options;
+		private IDisposable _serverDisposable;
 
-        #endregion
+		#endregion
 
-        #region C'tor
+		#region C'tor
 
-        public SelfHostServer(int port, bool callControllersStaticConstractorsOnInit = true)
-        {
-            _options = new StartOptions("http://*:" + port);
+		public SelfHostServer(string ipaddress = "localhost", int port = 80, bool callControllersStaticConstractorsOnInit = true)
+		{
+			_options = new StartOptions($"http://{ipaddress}:{port}");
 
-            if (callControllersStaticConstractorsOnInit)
-                CallControllersStaticConstractors();
-        }
+			if (callControllersStaticConstractorsOnInit)
+				CallControllersStaticConstractors();
+		}
 
-        #endregion
+		public SelfHostServer(Uri uri, bool callControllersStaticConstractorsOnInit = true)
+		{
+			_options = new StartOptions(uri.ToString());
 
-        #region Public
+			if (callControllersStaticConstractorsOnInit)
+				CallControllersStaticConstractors();
+		}
 
-        public void Connect(Action<HttpConfiguration> configure, bool useCors)
-        {
-            try
-            {
-                _serverDisposable = WebApp.Start(_options, appBuilder => BuildApp(appBuilder, configure, useCors));
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-        }
+		#endregion
 
-        private static void BuildApp(IAppBuilder appBuilder, Action<HttpConfiguration> configure, bool useCors)
-        {
-            var config = new HttpConfiguration();
+		#region Public
 
-            config.Formatters.Clear();
-            config.Formatters.Add(new JsonMediaTypeFormatter());
+		public void Connect(Action<HttpConfiguration> configure, bool useCors)
+		{
+			try
+			{
+				_serverDisposable = WebApp.Start(_options, appBuilder => BuildApp(appBuilder, configure, useCors));
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+			}
+		}
 
-            config.MapHttpAttributeRoutes();
+		private static void BuildApp(IAppBuilder appBuilder, Action<HttpConfiguration> configure, bool useCors)
+		{
+			var config = new HttpConfiguration();
 
-            if ( configure != null)
-                configure(config);
+			config.Formatters.Clear();
+			config.Formatters.Add(new JsonMediaTypeFormatter());
 
-            if (useCors)
-                appBuilder.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
+			config.MapHttpAttributeRoutes();
 
-            appBuilder.UseWebApi(config);
-        }
+			if (configure != null)
+				configure(config);
 
-        public async void Dispose()
-        {
-            _serverDisposable.Dispose();
-        }
+			if (useCors)
+				appBuilder.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
 
-        #endregion
+			appBuilder.UseWebApi(config);
+		}
 
-        #region Private
+		public async void Dispose()
+		{
+			_serverDisposable.Dispose();
+		}
 
-        private static void CallControllersStaticConstractors()
-        {
-            foreach (
-                var type in
-                    Assembly.GetEntryAssembly().DefinedTypes.Where(type => type.IsSubclassOf(typeof (ApiController))))
-                InvokeStaticConstractor(type);
-        }
+		#endregion
 
-        private static void InvokeStaticConstractor(Type type)
-        {
-            System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(type.TypeHandle);
-        }
+		#region Private
 
-        #endregion
-    }
+		private static void CallControllersStaticConstractors()
+		{
+			foreach (
+				var type in
+					Assembly.GetEntryAssembly().DefinedTypes.Where(type => type.IsSubclassOf(typeof(ApiController))))
+				InvokeStaticConstractor(type);
+		}
+
+		private static void InvokeStaticConstractor(Type type)
+		{
+			System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(type.TypeHandle);
+		}
+
+		#endregion
+	}
 }
