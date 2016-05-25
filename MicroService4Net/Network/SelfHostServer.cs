@@ -8,89 +8,89 @@ using Owin;
 
 namespace MicroService4Net.Network
 {
-	public class SelfHostServer : IDisposable
-	{
-		#region Fields
+    public class SelfHostServer : IDisposable
+    {
+        #region Fields
 
-		private readonly StartOptions _options;
-		private IDisposable _serverDisposable;
+        private readonly StartOptions _options;
+        private IDisposable _serverDisposable;
 
-		#endregion
+        #endregion
 
-		#region C'tor
+        #region C'tor
 
-		public SelfHostServer(string ipaddress = "localhost", int port = 80, bool callControllersStaticConstractorsOnInit = true)
-		{
-			_options = new StartOptions($"http://{ipaddress}:{port}");
+        public SelfHostServer(string ipaddress = "localhost", int port = 80, bool callControllersStaticConstractorsOnInit = true)
+        {
+            _options = new StartOptions($"http://{ipaddress}:{port}");
 
-			if (callControllersStaticConstractorsOnInit)
-				CallControllersStaticConstractors();
-		}
+            if (callControllersStaticConstractorsOnInit)
+                CallControllersStaticConstractors();
+        }
 
-		public SelfHostServer(Uri uri, bool callControllersStaticConstractorsOnInit = true)
-		{
-			_options = new StartOptions(uri.ToString());
+        public SelfHostServer(Uri uri, bool callControllersStaticConstractorsOnInit = true)
+        {
+            _options = new StartOptions(uri.ToString());
 
-			if (callControllersStaticConstractorsOnInit)
-				CallControllersStaticConstractors();
-		}
+            if (callControllersStaticConstractorsOnInit)
+                CallControllersStaticConstractors();
+        }
 
-		#endregion
+        #endregion
 
-		#region Public
+        #region Public
 
-		public void Connect(Action<HttpConfiguration> configure, bool useCors)
-		{
-			try
-			{
-				_serverDisposable = WebApp.Start(_options, appBuilder => BuildApp(appBuilder, configure, useCors));
-			}
-			catch (Exception ex)
-			{
-				Console.WriteLine(ex.Message);
-			}
-		}
+        public void Connect(Action<HttpConfiguration> configure, bool useCors)
+        {
+            try
+            {
+                _serverDisposable = WebApp.Start(_options, appBuilder => BuildApp(appBuilder, configure, useCors));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
 
-		private static void BuildApp(IAppBuilder appBuilder, Action<HttpConfiguration> configure, bool useCors)
-		{
-			var config = new HttpConfiguration();
+        private static void BuildApp(IAppBuilder appBuilder, Action<HttpConfiguration> configure, bool useCors)
+        {
+            var config = new HttpConfiguration();
 
-			config.Formatters.Clear();
-			config.Formatters.Add(new JsonMediaTypeFormatter());
+            config.Formatters.Clear();
+            config.Formatters.Add(new JsonMediaTypeFormatter());
 
-			config.MapHttpAttributeRoutes();
+            config.MapHttpAttributeRoutes();
 
-			if (configure != null)
-				configure(config);
+            if (configure != null)
+                configure(config);
 
-			if (useCors)
-				appBuilder.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
+            if (useCors)
+                appBuilder.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
 
-			appBuilder.UseWebApi(config);
-		}
+            appBuilder.UseWebApi(config);
+        }
 
-		public async void Dispose()
-		{
-			_serverDisposable.Dispose();
-		}
+        public async void Dispose()
+        {
+            _serverDisposable.Dispose();
+        }
 
-		#endregion
+        #endregion
 
-		#region Private
+        #region Private
 
-		private static void CallControllersStaticConstractors()
-		{
-			foreach (
-				var type in
-					Assembly.GetEntryAssembly().DefinedTypes.Where(type => type.IsSubclassOf(typeof(ApiController))))
-				InvokeStaticConstractor(type);
-		}
+        private static void CallControllersStaticConstractors()
+        {
+            foreach (
+                var type in
+                    Assembly.GetEntryAssembly().DefinedTypes.Where(type => type.IsSubclassOf(typeof(ApiController))))
+                InvokeStaticConstractor(type);
+        }
 
-		private static void InvokeStaticConstractor(Type type)
-		{
-			System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(type.TypeHandle);
-		}
+        private static void InvokeStaticConstractor(Type type)
+        {
+            System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(type.TypeHandle);
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }
