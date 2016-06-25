@@ -19,17 +19,9 @@ namespace MicroService4Net.Network
 
         #region C'tor
 
-        public SelfHostServer(string ipaddress = "localhost", int port = 80, bool callControllersStaticConstractorsOnInit = true)
+        public SelfHostServer(string ipaddress, int port, bool callControllersStaticConstractorsOnInit)
         {
             _options = new StartOptions($"http://{ipaddress}:{port}");
-
-            if (callControllersStaticConstractorsOnInit)
-                CallControllersStaticConstractors();
-        }
-
-        public SelfHostServer(Uri uri, bool callControllersStaticConstractorsOnInit = true)
-        {
-            _options = new StartOptions(uri.ToString());
 
             if (callControllersStaticConstractorsOnInit)
                 CallControllersStaticConstractors();

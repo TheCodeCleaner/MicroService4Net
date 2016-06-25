@@ -5,9 +5,9 @@ namespace MicroService4Net.Example.Controllers
     public class ExampleController : ApiController
     {
         [Route("Example")]
-        public IHttpActionResult GetExample()
+        public string GetExample()
         {
-            return Ok(new { Msg = "Example" });
+            return "Example";
         }
     }
 }

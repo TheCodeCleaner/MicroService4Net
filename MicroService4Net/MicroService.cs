@@ -18,52 +18,30 @@ namespace MicroService4Net
 
         #region Fields
 
-        private readonly string _serviceDisplayName;
-        private readonly string _ipAddress;
-        private readonly int _port;
-        private readonly WindowsServiceManager _serviceManager;
-        private readonly RegistryManipulator _registryManipulator;
+        private string _serviceDisplayName;
+        private string _ipAddress;
+        private int _port;
+        private WindowsServiceManager _serviceManager;
+        private RegistryManipulator _registryManipulator;
         private SelfHostServer _selfHostServer;
-        private readonly Action<HttpConfiguration> _configure;
-        private readonly bool _useCors;
-        private readonly Uri _uri;
-        private readonly bool _isValidUri = false;
+        private Action<HttpConfiguration> _configure;
+        private bool _useCors;
 
         #endregion
 
         #region C'tor
 
-        /// <summary>
-        /// Microservice constructor
-        /// </summary>
-        /// <param name="ipAddress">Valid IP addres (ie. localhost, *, 192.168.0.1, etc.)</param>
-        /// <param name="port"></param>
-        /// <param name="serviceDisplayName"></param>
-        /// <param name="serviceName"></param>
-        /// <param name="configure"></param>
-        /// <param name="useCors"></param>
-        public MicroService(string ipAddress = "*", int port = 8080, string serviceDisplayName = null, string serviceName = null,
+        public MicroService( int port = 8080, string serviceDisplayName = null, string serviceName = null,
             Action<HttpConfiguration> configure = null, bool useCors = true)
         {
-            _ipAddress = ipAddress;
-            _port = port;
-            _configure = configure;
-            _useCors = useCors;
+            InitMicroService("*", port, serviceDisplayName, serviceName, configure, useCors);
+        }
 
-            // NOTE: * in IP address binds to all IP addresses and it is not valid URI
-            _isValidUri = Uri.TryCreate($"http://{_ipAddress}:{_port}", UriKind.RelativeOrAbsolute, out _uri);
-
-            var assemblyName = Assembly.GetEntryAssembly().GetName().Name;
-            _serviceDisplayName = serviceDisplayName ?? assemblyName;
-            serviceName = serviceName ?? assemblyName;
-
-            _serviceManager = new WindowsServiceManager(_serviceDisplayName);
-            _registryManipulator = new RegistryManipulator(serviceName);
-
-            InternalService.OsStarted += () => Start(_configure, _useCors);
-            InternalService.OsStopped += Stop;
-            ProjectInstaller.InitInstaller(_serviceDisplayName, serviceName);
-
+        /// <param name="ipAddress">Valid IP address (ie. localhost, *, 192.168.0.1, etc.)</param>
+        public MicroService(string ipAddress, int port = 8080, string serviceDisplayName = null, string serviceName = null,
+            Action<HttpConfiguration> configure = null, bool useCors = true)
+        {
+            InitMicroService(ipAddress, port, serviceDisplayName, serviceName, configure, useCors);
         }
 
         #endregion
@@ -98,6 +76,26 @@ namespace MicroService4Net
 
         #region Private
 
+        private void InitMicroService(string ipAddress, int port, string serviceDisplayName, string serviceName,
+            Action<HttpConfiguration> configure, bool useCors)
+        {
+            _ipAddress = ipAddress;
+            _port = port;
+            _configure = configure;
+            _useCors = useCors;
+
+            var assemblyName = Assembly.GetEntryAssembly().GetName().Name;
+            _serviceDisplayName = serviceDisplayName ?? assemblyName;
+            serviceName = serviceName ?? assemblyName;
+
+            _serviceManager = new WindowsServiceManager(_serviceDisplayName);
+            _registryManipulator = new RegistryManipulator(serviceName);
+
+            InternalService.OsStarted += () => Start(_configure, _useCors);
+            InternalService.OsStopped += Stop;
+            ProjectInstaller.InitInstaller(_serviceDisplayName, serviceName);
+        }
+
         private void RunConsole()
         {
             Start(_configure, _useCors);
@@ -129,21 +127,16 @@ namespace MicroService4Net
         private void Stop()
         {
             _selfHostServer.Dispose();
-            if (OnServiceStopped != null)
-                OnServiceStopped.Invoke();
+            OnServiceStopped?.Invoke();
         }
 
         private void Start(Action<HttpConfiguration> configure, bool useCors)
         {
-            if (_isValidUri)
-                _selfHostServer = new SelfHostServer(_uri);
-            else
-                _selfHostServer = new SelfHostServer(_ipAddress, _port);
+            _selfHostServer = new SelfHostServer(_ipAddress, _port, true);
 
             _selfHostServer.Connect(configure, useCors);
             Console.WriteLine($"Service {_serviceDisplayName} started on {_ipAddress}:{_port}");
-            if (OnServiceStarted != null)
-                OnServiceStarted.Invoke();
+            OnServiceStarted?.Invoke();
         }
 
         #endregion
