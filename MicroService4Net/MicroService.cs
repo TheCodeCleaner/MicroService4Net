@@ -37,7 +37,7 @@ namespace MicroService4Net
             InitMicroService("*", port, serviceDisplayName, serviceName, configure, useCors);
         }
 
-        /// <param name="ipAddress">Valid IP address (ie. localhost, *, 192.168.0.1, etc.)</param>
+        /// <param name="ipAddress">Valid IP address (ie. localhost, *, 192.168.0.1, etc.). * binds to all IPs and it may be security issue (VPNs etc)</param>
         public MicroService(string ipAddress, int port = 8080, string serviceDisplayName = null, string serviceName = null,
             Action<HttpConfiguration> configure = null, bool useCors = true)
         {
