@@ -19,9 +19,17 @@ namespace MicroService4Net.Network
 
         #region C'tor
 
-        public SelfHostServer(int port, bool callControllersStaticConstractorsOnInit = true)
+        public SelfHostServer(string ipaddress = "localhost", int port = 80, bool callControllersStaticConstractorsOnInit = true)
         {
-            _options = new StartOptions("http://*:" + port);
+            _options = new StartOptions($"http://{ipaddress}:{port}");
+
+            if (callControllersStaticConstractorsOnInit)
+                CallControllersStaticConstractors();
+        }
+
+        public SelfHostServer(Uri uri, bool callControllersStaticConstractorsOnInit = true)
+        {
+            _options = new StartOptions(uri.ToString());
 
             if (callControllersStaticConstractorsOnInit)
                 CallControllersStaticConstractors();
@@ -52,7 +60,7 @@ namespace MicroService4Net.Network
 
             config.MapHttpAttributeRoutes();
 
-            if ( configure != null)
+            if (configure != null)
                 configure(config);
 
             if (useCors)
@@ -74,7 +82,7 @@ namespace MicroService4Net.Network
         {
             foreach (
                 var type in
-                    Assembly.GetEntryAssembly().DefinedTypes.Where(type => type.IsSubclassOf(typeof (ApiController))))
+                    Assembly.GetEntryAssembly().DefinedTypes.Where(type => type.IsSubclassOf(typeof(ApiController))))
                 InvokeStaticConstractor(type);
         }
 
